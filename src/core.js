@@ -240,12 +240,37 @@ IScroll.prototype = {
 		newY = this.y + deltaY;
 
 		// Slow down if outside of the boundaries
-		if ( newX > 0 || newX < this.maxScrollX ) {
-			newX = this.options.bounce ? this.x + deltaX / 3 : newX > 0 ? 0 : this.maxScrollX;
-		}
-		if ( newY > 0 || newY < this.maxScrollY ) {
-			newY = this.options.bounce ? this.y + deltaY / 3 : newY > 0 ? 0 : this.maxScrollY;
-		}
+    if ( newX > 0 || newX < this.maxScrollX ) {
+      if (this.options.bounce) {
+        newX = this.x + deltaX / 3;
+      } else if ( newX > 0 ) {
+        if ( this.options.centerOnZoomOut ) {
+          if ( this.hasHorizontalScroll ) {
+            newX = 0;
+          }
+        } else {
+          newX = 0;
+        }
+      } else {
+        newX = this.maxScrollX;
+      }
+    }
+
+    if ( newY > 0 || newY < this.maxScrollY ) {
+      if (this.options.bounce) {
+        newY = this.y + deltaY / 3;
+      } else if (newY > 0) {
+        if ( this.options.centerOnZoomOut ) {
+          if ( this.hasVerticalScroll ) {
+            newY = 0;
+          }
+        } else {
+          newY = 0;
+        }
+      } else {
+        newY = this.maxScrollY;
+      }
+    }
 
 		this.directionX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
 		this.directionY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
@@ -361,17 +386,17 @@ IScroll.prototype = {
 
 		time = time || 0;
 
-		if ( !this.hasHorizontalScroll || this.x > 0 ) {
-			x = 0;
-		} else if ( this.x < this.maxScrollX ) {
-			x = this.maxScrollX;
-		}
+    if ( !this.options.centerOnZoomOut && (!this.hasHorizontalScroll || this.x > 0) ) {
+      x = 0;
+    } else if ( this.x < this.maxScrollX ) {
+      x = this.maxScrollX;
+    }
 
-		if ( !this.hasVerticalScroll || this.y > 0 ) {
-			y = 0;
-		} else if ( this.y < this.maxScrollY ) {
-			y = this.maxScrollY;
-		}
+    if ( !this.options.centerOnZoomOut && (!this.hasVerticalScroll || this.y > 0 )) {
+      y = 0;
+    } else if ( this.y < this.maxScrollY ) {
+      y = this.maxScrollY;
+    }
 
 		if ( x == this.x && y == this.y ) {
 			return false;

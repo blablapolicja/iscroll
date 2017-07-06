@@ -91,17 +91,29 @@
 		this.directionX = wheelDeltaX > 0 ? -1 : wheelDeltaX < 0 ? 1 : 0;
 		this.directionY = wheelDeltaY > 0 ? -1 : wheelDeltaY < 0 ? 1 : 0;
 
-		if ( newX > 0 ) {
-			newX = 0;
-		} else if ( newX < this.maxScrollX ) {
-			newX = this.maxScrollX;
-		}
+    if ( newX > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasHorizontalScroll ) {
+          newX = 0;
+        }
+      } else {
+        newX = 0;
+      }
+    } else if ( newX < this.maxScrollX ) {
+      newX = this.maxScrollX;
+    }
 
-		if ( newY > 0 ) {
-			newY = 0;
-		} else if ( newY < this.maxScrollY ) {
-			newY = this.maxScrollY;
-		}
+    if ( newY > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasVerticalScroll ) {
+          newY = 0;
+        }
+      } else {
+        newY = 0;
+      }
+    } else if ( newY < this.maxScrollY ) {
+      newY = this.maxScrollY;
+    }
 
 		this.scrollTo(newX, newY, 0);
 

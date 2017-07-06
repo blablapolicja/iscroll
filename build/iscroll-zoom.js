@@ -323,6 +323,7 @@ function IScroll (el, options) {
 
 		zoomMin: 1,
 		zoomMax: 4, startZoom: 1,
+		centerOnZoomOut: false,
 
 		resizeScrollbars: true,
 
@@ -592,12 +593,37 @@ IScroll.prototype = {
 		newY = this.y + deltaY;
 
 		// Slow down if outside of the boundaries
-		if ( newX > 0 || newX < this.maxScrollX ) {
-			newX = this.options.bounce ? this.x + deltaX / 3 : newX > 0 ? 0 : this.maxScrollX;
-		}
-		if ( newY > 0 || newY < this.maxScrollY ) {
-			newY = this.options.bounce ? this.y + deltaY / 3 : newY > 0 ? 0 : this.maxScrollY;
-		}
+    if ( newX > 0 || newX < this.maxScrollX ) {
+      if (this.options.bounce) {
+        newX = this.x + deltaX / 3;
+      } else if ( newX > 0 ) {
+        if ( this.options.centerOnZoomOut ) {
+          if ( this.hasHorizontalScroll ) {
+            newX = 0;
+          }
+        } else {
+          newX = 0;
+        }
+      } else {
+        newX = this.maxScrollX;
+      }
+    }
+
+    if ( newY > 0 || newY < this.maxScrollY ) {
+      if (this.options.bounce) {
+        newY = this.y + deltaY / 3;
+      } else if (newY > 0) {
+        if ( this.options.centerOnZoomOut ) {
+          if ( this.hasVerticalScroll ) {
+            newY = 0;
+          }
+        } else {
+          newY = 0;
+        }
+      } else {
+        newY = this.maxScrollY;
+      }
+    }
 
 		this.directionX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
 		this.directionY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
@@ -730,17 +756,17 @@ IScroll.prototype = {
 
 		time = time || 0;
 
-		if ( !this.hasHorizontalScroll || this.x > 0 ) {
-			x = 0;
-		} else if ( this.x < this.maxScrollX ) {
-			x = this.maxScrollX;
-		}
+    if ( !this.options.centerOnZoomOut && (!this.hasHorizontalScroll || this.x > 0) ) {
+      x = 0;
+    } else if ( this.x < this.maxScrollX ) {
+      x = this.maxScrollX;
+    }
 
-		if ( !this.hasVerticalScroll || this.y > 0 ) {
-			y = 0;
-		} else if ( this.y < this.maxScrollY ) {
-			y = this.maxScrollY;
-		}
+    if ( !this.options.centerOnZoomOut && (!this.hasVerticalScroll || this.y > 0 )) {
+      y = 0;
+    } else if ( this.y < this.maxScrollY ) {
+      y = this.maxScrollY;
+    }
 
 		if ( x == this.x && y == this.y ) {
 			return false;
@@ -776,7 +802,7 @@ IScroll.prototype = {
 
 		this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
 		this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
-		
+
 		if ( !this.hasHorizontalScroll ) {
 			this.maxScrollX = 0;
 			this.scrollerWidth = this.wrapperWidth;
@@ -790,7 +816,7 @@ IScroll.prototype = {
 		this.endTime = 0;
 		this.directionX = 0;
 		this.directionY = 0;
-		
+
 		if(utils.hasPointer && !this.options.disablePointer) {
 			// The wrapper should have `touchAction` property for using pointerEvent.
 			this.wrapper.style[utils.style.touchAction] = utils.getTouchAction(this.options.eventPassthrough, true);
@@ -809,7 +835,7 @@ IScroll.prototype = {
 
 // INSERT POINT: _refresh
 
-	},	
+	},
 
 	on: function (type, fn) {
 		if ( !this._events[type] ) {
@@ -1268,17 +1294,29 @@ IScroll.prototype = {
 
 		this.refresh();		// update boundaries
 
-		if ( x > 0 ) {
-			x = 0;
-		} else if ( x < this.maxScrollX ) {
-			x = this.maxScrollX;
-		}
+    if ( x > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasHorizontalScroll ) {
+          x = 0;
+        }
+      } else {
+        x = 0;
+      }
+    } else if ( x < this.maxScrollX ) {
+      x = this.maxScrollX;
+    }
 
-		if ( y > 0 ) {
-			y = 0;
-		} else if ( y < this.maxScrollY ) {
-			y = this.maxScrollY;
-		}
+    if ( y > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasVerticalScroll ) {
+          y = 0;
+        }
+      } else {
+        y = 0;
+      }
+    } else if ( y < this.maxScrollY ) {
+      y = this.maxScrollY;
+    }
 
 		this.scrollTo(x, y, time);
 	},
@@ -1403,17 +1441,29 @@ IScroll.prototype = {
 		this.directionX = wheelDeltaX > 0 ? -1 : wheelDeltaX < 0 ? 1 : 0;
 		this.directionY = wheelDeltaY > 0 ? -1 : wheelDeltaY < 0 ? 1 : 0;
 
-		if ( newX > 0 ) {
-			newX = 0;
-		} else if ( newX < this.maxScrollX ) {
-			newX = this.maxScrollX;
-		}
+    if ( newX > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasHorizontalScroll ) {
+          newX = 0;
+        }
+      } else {
+        newX = 0;
+      }
+    } else if ( newX < this.maxScrollX ) {
+      newX = this.maxScrollX;
+    }
 
-		if ( newY > 0 ) {
-			newY = 0;
-		} else if ( newY < this.maxScrollY ) {
-			newY = this.maxScrollY;
-		}
+    if ( newY > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasVerticalScroll ) {
+          newY = 0;
+        }
+      } else {
+        newY = 0;
+      }
+    } else if ( newY < this.maxScrollY ) {
+      newY = this.maxScrollY;
+    }
 
 		this.scrollTo(newX, newY, 0);
 
@@ -1880,7 +1930,7 @@ IScroll.prototype = {
 			case 'mousewheel':
 				if ( this.options.wheelAction == 'zoom' ) {
 					this._wheelZoom(e);
-					return;	
+					return;
 				}
 				this._wheel(e);
 				break;

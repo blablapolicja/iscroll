@@ -126,17 +126,29 @@
 
 		this.refresh();		// update boundaries
 
-		if ( x > 0 ) {
-			x = 0;
-		} else if ( x < this.maxScrollX ) {
-			x = this.maxScrollX;
-		}
+    if ( x > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasHorizontalScroll ) {
+          x = 0;
+        }
+      } else {
+        x = 0;
+      }
+    } else if ( x < this.maxScrollX ) {
+      x = this.maxScrollX;
+    }
 
-		if ( y > 0 ) {
-			y = 0;
-		} else if ( y < this.maxScrollY ) {
-			y = this.maxScrollY;
-		}
+    if ( y > 0 ) {
+      if ( this.options.centerOnZoomOut ) {
+        if ( this.hasVerticalScroll ) {
+          y = 0;
+        }
+      } else {
+        y = 0;
+      }
+    } else if ( y < this.maxScrollY ) {
+      y = this.maxScrollY;
+    }
 
 		this.scrollTo(x, y, time);
 	},
